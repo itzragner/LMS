@@ -1,0 +1,49 @@
+@layer components {
+    .eyebrow {
+        @apply text-xs font-semibold uppercase tracking-widest text-teal-300;
+    }
+    .card {
+        @apply rounded-2xl p-6 bg-slate-900/70 backdrop-blur-xl border border-white/10;
+    }
+    .nav-link {
+        @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400
+               hover:text-teal-300 hover:bg-white/[0.07] text-sm font-medium transition-all duration-200;
+    }
+    .nav-link.active {
+        @apply text-teal-300 bg-teal-300/[0.1];
+    }
+    .btn {
+        @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm
+               bg-gradient-to-r from-teal-300 to-cyan-400 text-slate-900
+               shadow-lg hover:-translate-y-0.5 transition-all duration-200;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm
+               text-slate-200 border border-white/20 bg-transparent
+               hover:bg-white/[0.07] hover:border-white/30 transition-all duration-200;
+    }
+    .btn-danger {
+        @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm
+               text-white bg-gradient-to-r from-rose-400 to-pink-500
+               shadow-lg hover:-translate-y-0.5 transition-all duration-200;
+    }
+    .btn-sm {
+        @apply px-3.5 py-1.5 text-xs;
+    }
+    .form-label {
+        @apply block text-sm font-medium text-slate-300 mb-1.5;
+    }
+    .form-input {
+        @apply w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.12]
+               text-slate-100 placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-teal-300/40 focus:border-teal-300/40
+               transition-all;
+    }
+    .tag {
+        @apply inline-block px-3 py-1 rounded-full text-xs font-semibold
+               bg-teal-300/10 text-teal-300 border border-teal-300/20;
+    }
+    .metric-box {
+        @apply rounded-2xl p-6 bg-slate-900/70 backdrop-blur-xl border border-white/10;
+    }
+}

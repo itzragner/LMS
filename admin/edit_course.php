@@ -30,34 +30,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
-<section class="card">
-    <div class="card-header">
+
+<div class="card max-w-2xl">
+    <div class="flex items-start justify-between gap-4 mb-6">
         <div>
-            <span class="eyebrow">Édition</span>
-            <h2>Modifier le cours</h2>
-            <p class="muted">Mettez à jour le titre ou la description du cours.</p>
+            <p class="eyebrow mb-1">Édition</p>
+            <h2 class="text-xl font-bold text-slate-100">Modifier le cours</h2>
+            <p class="text-sm text-slate-400 mt-1">Mettez à jour le titre ou la description du cours.</p>
         </div>
-        <a class="btn btn-secondary" href="/projet/admin/courses.php">Retour</a>
+        <a class="btn-secondary shrink-0" href="/projet/admin/courses.php">Retour</a>
     </div>
 
     <?php if ($errors): ?>
-        <ul class="errors">
+        <ul class="px-4 py-3 rounded-xl border bg-rose-400/10 border-rose-400/30 text-rose-300 text-sm mb-5 space-y-1 list-disc list-inside">
             <?php foreach ($errors as $error): ?>
                 <li><?= e($error) ?></li>
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
 
-    <form method="POST">
+    <form method="POST" class="space-y-5">
         <div>
-            <label for="title">Titre du cours</label>
-            <input id="title" type="text" name="title" value="<?= e($_POST['title'] ?? $course['title']) ?>" required>
+            <label class="form-label" for="title">Titre du cours</label>
+            <input class="form-input" id="title" type="text" name="title"
+                   value="<?= e($_POST['title'] ?? $course['title']) ?>" required>
         </div>
         <div>
-            <label for="description">Description</label>
-            <textarea id="description" name="description" required><?= e($_POST['description'] ?? $course['description']) ?></textarea>
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-input resize-y" id="description" name="description" rows="4" required><?= e($_POST['description'] ?? $course['description']) ?></textarea>
         </div>
-        <button type="submit">Enregistrer les modifications</button>
+        <div class="flex gap-3 pt-1">
+            <button type="submit" class="btn">Enregistrer les modifications</button>
+            <a class="btn-secondary" href="/projet/admin/courses.php">Annuler</a>
+        </div>
     </form>
-</section>
+</div>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

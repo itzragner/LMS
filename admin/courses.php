@@ -11,60 +11,72 @@ $totalStudents = (int) $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'stu
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
-<section class="metric-row">
-    <article class="metric-box">
-        <span class="eyebrow">Cours</span>
-        <strong><?= $totalCourses ?></strong>
-        <p>Nombre total de cours publiés.</p>
-    </article>
-    <article class="metric-box">
-        <span class="eyebrow">Étudiants</span>
-        <strong><?= $totalStudents ?></strong>
-        <p>Utilisateurs étudiants enregistrés.</p>
-    </article>
-    <article class="metric-box">
-        <span class="eyebrow">Inscriptions</span>
-        <strong><?= $totalEnrollments ?></strong>
-        <p>Inscriptions cumulées sur la plateforme.</p>
-    </article>
-</section>
 
-<section class="card">
-    <div class="card-header">
+<!-- Metrics -->
+<div class="grid sm:grid-cols-3 gap-5">
+    <article class="metric-box">
+        <p class="eyebrow mb-1">Cours</p>
+        <p class="text-4xl font-extrabold text-slate-100 my-1"><?= $totalCourses ?></p>
+        <p class="text-sm text-slate-400">Nombre total de cours publiés.</p>
+    </article>
+    <article class="metric-box">
+        <p class="eyebrow mb-1">Étudiants</p>
+        <p class="text-4xl font-extrabold text-slate-100 my-1"><?= $totalStudents ?></p>
+        <p class="text-sm text-slate-400">Utilisateurs étudiants enregistrés.</p>
+    </article>
+    <article class="metric-box">
+        <p class="eyebrow mb-1">Inscriptions</p>
+        <p class="text-4xl font-extrabold text-slate-100 my-1"><?= $totalEnrollments ?></p>
+        <p class="text-sm text-slate-400">Inscriptions cumulées sur la plateforme.</p>
+    </article>
+</div>
+
+<!-- Courses table -->
+<div class="card">
+    <div class="flex items-start justify-between gap-4 mb-6">
         <div>
-            <span class="eyebrow">Administration</span>
-            <h2>Gestion des cours</h2>
-            <p class="muted">Ajoutez, modifiez ou supprimez les cours depuis cet espace.</p>
+            <p class="eyebrow mb-1">Administration</p>
+            <h2 class="text-xl font-bold text-slate-100">Gestion des cours</h2>
+            <p class="text-sm text-slate-400 mt-1">Ajoutez, modifiez ou supprimez les cours depuis cet espace.</p>
         </div>
-        <a class="btn" href="/projet/admin/add_course.php">Ajouter un cours</a>
+        <a class="btn shrink-0" href="/projet/admin/add_course.php">Ajouter un cours</a>
     </div>
 
     <?php if (!$courses): ?>
-        <div class="empty-state">
-            <h3>Aucun cours créé</h3>
-            <p>Commencez par ajouter votre premier cours à la plateforme.</p>
+        <div class="text-center py-12">
+            <p class="text-lg font-semibold text-slate-300 mb-1">Aucun cours créé</p>
+            <p class="text-sm text-slate-500">Commencez par ajouter votre premier cours à la plateforme.</p>
         </div>
     <?php else: ?>
-        <div class="table-responsive">
-            <table class="table">
+        <div class="overflow-x-auto -mx-6 px-6">
+            <table class="w-full text-sm">
                 <thead>
-                    <tr>
-                        <th>Titre</th>
-                        <th>Description</th>
-                        <th>Inscrits</th>
-                        <th>Actions</th>
+                    <tr class="border-b border-white/10">
+                        <th class="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Titre</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Description</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Inscrits</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-white/[0.05]">
                     <?php foreach ($courses as $course): ?>
-                        <tr>
-                            <td><strong><?= e($course['title']) ?></strong></td>
-                            <td><?= e($course['description']) ?></td>
-                            <td><span class="tag"><?= (int) $course['enrolled_count'] ?> inscrits</span></td>
-                            <td>
-                                <div class="actions">
-                                    <a class="btn btn-secondary" href="/projet/admin/edit_course.php?id=<?= (int) $course['id'] ?>">Modifier</a>
-                                    <a class="btn btn-danger" href="/projet/admin/delete_course.php?id=<?= (int) $course['id'] ?>" onclick="return confirm('Supprimer ce cours ?')">Supprimer</a>
+                        <tr class="hover:bg-white/[0.03] transition-colors">
+                            <td class="py-3.5 px-4">
+                                <span class="font-semibold text-slate-200"><?= e($course['title']) ?></span>
+                            </td>
+                            <td class="py-3.5 px-4 text-slate-400 max-w-xs truncate"><?= e($course['description']) ?></td>
+                            <td class="py-3.5 px-4">
+                                <span class="tag"><?= (int) $course['enrolled_count'] ?> inscrits</span>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <div class="flex items-center gap-2">
+                                    <a class="btn-secondary btn-sm" href="/projet/admin/course_students.php?id=<?= (int) $course['id'] ?>">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        Inscrits
+                                    </a>
+                                    <a class="btn-secondary btn-sm" href="/projet/admin/edit_course.php?id=<?= (int) $course['id'] ?>">Modifier</a>
+                                    <a class="btn-danger btn-sm" href="/projet/admin/delete_course.php?id=<?= (int) $course['id'] ?>"
+                                       onclick="return confirm('Supprimer ce cours ?')">Supprimer</a>
                                 </div>
                             </td>
                         </tr>
@@ -73,5 +85,6 @@ require_once __DIR__ . '/../includes/header.php';
             </table>
         </div>
     <?php endif; ?>
-</section>
+</div>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

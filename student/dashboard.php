@@ -12,59 +12,62 @@ $allCourses = (int) $pdo->query('SELECT COUNT(*) FROM courses')->fetchColumn();
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
-<section class="card">
-    <span class="eyebrow">Bienvenue</span>
-    <h2><?= e($user['name']) ?>, voici votre progression.</h2>
-    <p>Consultez rapidement vos inscriptions et explorez de nouveaux cours depuis votre espace personnel.</p>
-</section>
 
-<section class="metric-row">
-    <article class="metric-box">
-        <span class="eyebrow">Mes cours</span>
-        <strong><?= $totalCourses ?></strong>
-        <p>Cours auxquels vous êtes inscrit.</p>
-    </article>
-    <article class="metric-box">
-        <span class="eyebrow">Catalogue total</span>
-        <strong><?= $allCourses ?></strong>
-        <p>Nombre total de cours disponibles.</p>
-    </article>
-    <article class="metric-box">
-        <span class="eyebrow">Action</span>
-        <strong>Explorer</strong>
-        <p>Découvrez de nouveaux contenus à rejoindre.</p>
-    </article>
-</section>
+<!-- Welcome banner -->
+<div class="card">
+    <p class="eyebrow mb-1">Bienvenue</p>
+    <h2 class="text-xl font-bold text-slate-100 mb-1"><?= e($user['name']) ?>, voici votre progression.</h2>
+    <p class="text-slate-400 text-sm">Consultez rapidement vos inscriptions et explorez de nouveaux cours depuis votre espace personnel.</p>
+</div>
 
-<section class="card">
-    <div class="card-header">
+<!-- Metrics -->
+<div class="grid sm:grid-cols-3 gap-5">
+    <article class="metric-box">
+        <p class="eyebrow mb-1">Mes cours</p>
+        <p class="text-4xl font-extrabold text-slate-100 my-1"><?= $totalCourses ?></p>
+        <p class="text-sm text-slate-400">Cours auxquels vous êtes inscrit.</p>
+    </article>
+    <article class="metric-box">
+        <p class="eyebrow mb-1">Catalogue total</p>
+        <p class="text-4xl font-extrabold text-slate-100 my-1"><?= $allCourses ?></p>
+        <p class="text-sm text-slate-400">Nombre total de cours disponibles.</p>
+    </article>
+    <article class="metric-box">
+        <p class="eyebrow mb-1">Action</p>
+        <p class="text-2xl font-extrabold text-teal-300 my-1">Explorer</p>
+        <p class="text-sm text-slate-400">Découvrez de nouveaux contenus à rejoindre.</p>
+    </article>
+</div>
+
+<!-- Enrolled courses -->
+<div class="card">
+    <div class="flex items-start justify-between gap-4 mb-6">
         <div>
-            <span class="eyebrow">Mes inscriptions</span>
-            <h2>Cours inscrits</h2>
+            <p class="eyebrow mb-1">Mes inscriptions</p>
+            <h2 class="text-xl font-bold text-slate-100">Cours inscrits</h2>
         </div>
-        <a class="btn" href="/projet/student/courses.php">Explorer les cours</a>
+        <a class="btn shrink-0" href="/projet/student/courses.php">Explorer les cours</a>
     </div>
 
     <?php if (!$enrollments): ?>
-        <div class="empty-state">
-            <h3>Aucune inscription pour le moment</h3>
-            <p>Commencez par consulter le catalogue et inscrivez-vous à votre premier cours.</p>
+        <div class="text-center py-12">
+            <p class="text-lg font-semibold text-slate-300 mb-1">Aucune inscription pour le moment</p>
+            <p class="text-sm text-slate-500">Commencez par consulter le catalogue et inscrivez-vous à votre premier cours.</p>
         </div>
     <?php else: ?>
-        <div class="course-list">
+        <div class="space-y-3">
             <?php foreach ($enrollments as $course): ?>
-                <article class="course-card">
-                    <div class="course-card-top">
-                        <div>
-                            <h3><?= e($course['title']) ?></h3>
-                            <p><?= e($course['description']) ?></p>
-                        </div>
-                        <span class="tag">Inscrit</span>
+                <article class="flex items-start justify-between gap-4 p-4 rounded-xl border border-white/[0.07] bg-white/[0.03] hover:bg-white/[0.05] transition-colors">
+                    <div class="min-w-0">
+                        <h3 class="font-semibold text-slate-200 mb-0.5"><?= e($course['title']) ?></h3>
+                        <p class="text-sm text-slate-400 truncate"><?= e($course['description']) ?></p>
+                        <p class="text-xs text-slate-500 mt-1">Inscrit le <?= e($course['enrolled_at']) ?></p>
                     </div>
-                    <p>Ajouté à votre tableau de bord le <?= e($course['enrolled_at']) ?></p>
+                    <span class="tag shrink-0">Inscrit</span>
                 </article>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-</section>
+</div>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

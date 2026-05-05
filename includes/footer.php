@@ -5,13 +5,9 @@
     </div>
 <?php else: ?>
     </main>
-    <footer class="public-footer">
-        <div class="container footer-flex">
-            <div>
-                <strong>LMS Nova</strong>
-                <p>Plateforme simple de gestion de cours en PHP / PDO.</p>
-            </div>
-            <p>Conçu pour répondre au cahier des charges.</p>
+    <footer class="border-t border-white/10 mt-16">
+        <div class="max-w-[1180px] mx-auto px-6 py-8">
+            <p class="text-sm text-slate-500 text-center">copyright &copy; 2026 LMS. Tous droits réservés.</p>
         </div>
     </footer>
 <?php endif; ?>

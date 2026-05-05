@@ -34,46 +34,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require_once __DIR__ . '/includes/header.php';
 ?>
-<section class="auth-shell">
-    <div class="glass-card auth-side">
-        <div>
-            <span class="eyebrow">Connexion</span>
-            <h1 class="display" style="font-size: clamp(1.9rem, 3vw, 3rem);">Reprenez votre apprentissage.</h1>
-            <p>Accédez à votre espace étudiant ou administrateur avec une interface moderne et rapide.</p>
-        </div>
 
-        <div class="auth-feature-list">
-            <div class="feature-pill">Suivi des cours inscrits</div>
-            <div class="feature-pill">Gestion admin centralisée</div>
-            <div class="feature-pill">Sessions sécurisées par rôle</div>
-        </div>
-    </div>
+<section class="min-h-[calc(100vh-80px)] flex items-center">
+    <div class="w-full grid lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
 
-    <div class="card auth-card">
-        <div class="card-header">
-            <div>
-                <span class="eyebrow">Bienvenue</span>
-                <h2>Se connecter</h2>
+        <!-- Left panel -->
+        <div class="rounded-2xl p-10 border border-white/10 relative overflow-hidden hidden lg:block"
+             style="background: linear-gradient(135deg, rgba(15,25,55,0.9) 0%, rgba(30,58,95,0.5) 100%); backdrop-filter: blur(18px); min-height: 480px;">
+            <div class="absolute inset-0 opacity-20"
+                 style="background: radial-gradient(circle at 30% 70%, #8b5cf6 0%, transparent 60%);"></div>
+            <div class="relative flex flex-col h-full">
+                <p class="eyebrow mb-4">Connexion</p>
+                <h1 class="text-3xl font-extrabold text-slate-100 leading-tight mb-4">
+                    Reprenez votre apprentissage.
+                </h1>
+                <p class="text-slate-400 mb-8">
+                    Accédez à votre espace étudiant ou administrateur avec une interface moderne et rapide.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-auto">
+                    <span class="px-3 py-1.5 rounded-lg text-xs font-medium bg-teal-300/10 text-teal-300 border border-teal-300/20">Suivi des cours inscrits</span>
+                    <span class="px-3 py-1.5 rounded-lg text-xs font-medium bg-teal-300/10 text-teal-300 border border-teal-300/20">Gestion admin centralisée</span>
+                    <span class="px-3 py-1.5 rounded-lg text-xs font-medium bg-teal-300/10 text-teal-300 border border-teal-300/20">Sessions sécurisées par rôle</span>
+                </div>
             </div>
         </div>
 
-        <?php if ($error): ?>
-            <div class="alert alert-danger"><?= e($error) ?></div>
-        <?php endif; ?>
+        <!-- Form card -->
+        <div class="card max-w-md w-full mx-auto">
+            <p class="eyebrow mb-1">Bienvenue</p>
+            <h2 class="text-2xl font-bold text-slate-100 mb-6">Se connecter</h2>
 
-        <form method="POST">
-            <div>
-                <label for="email">Email</label>
-                <input id="email" type="email" name="email" placeholder="votre@email.com" required>
-            </div>
-            <div>
-                <label for="password">Mot de passe</label>
-                <input id="password" type="password" name="password" placeholder="••••••••" required>
-            </div>
-            <button type="submit">Se connecter</button>
-        </form>
+            <?php if ($error): ?>
+                <div class="px-4 py-3 rounded-xl border bg-rose-400/10 border-rose-400/30 text-rose-300 text-sm mb-5">
+                    <?= e($error) ?>
+                </div>
+            <?php endif; ?>
 
-        <p style="margin-top: 18px;">Pas encore de compte ? <a style="color: var(--primary);" href="/projet/register.php">Créer un compte</a></p>
+            <form method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-input" id="email" type="email" name="email" placeholder="votre@email.com" required>
+                </div>
+                <div>
+                    <label class="form-label" for="password">Mot de passe</label>
+                    <input class="form-input" id="password" type="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn w-full justify-center mt-2">Se connecter</button>
+            </form>
+
+            <p class="text-sm text-slate-400 mt-5 text-center">
+                Pas encore de compte ?
+                <a class="text-teal-300 hover:text-teal-200 font-medium transition-colors" href="/projet/register.php">Créer un compte</a>
+            </p>
+        </div>
+
     </div>
 </section>
+
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

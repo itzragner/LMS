@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/session.php';
+require_once 'session.php';
 
 function e(string $value): string
 {
