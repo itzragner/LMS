@@ -29,6 +29,10 @@ if (!$stmt->fetch()) {
 
 $courseId = (int) $lesson['course_id'];
 
+$stmt = $pdo->prepare('SELECT 1 FROM lesson_completions WHERE lesson_id = ? AND user_id = ?');
+$stmt->execute([$lessonId, $userId]);
+$isCompleted = (bool) $stmt->fetch();
+
 $stmtPrev = $pdo->prepare('SELECT id, title FROM lessons WHERE course_id = ? AND position < ? ORDER BY position DESC LIMIT 1');
 $stmtPrev->execute([$courseId, $lesson['position']]);
 $prev = $stmtPrev->fetch();
@@ -51,17 +55,38 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- Lesson content -->
 <div class="card max-w-3xl">
-    <div class="flex items-center gap-3 mb-6">
-        <span class="w-8 h-8 rounded-lg bg-teal-300/10 text-teal-300 border border-teal-300/20 flex items-center justify-center text-xs font-bold shrink-0">
-            <?= $lesson['position'] ?>
-        </span>
-        <div>
-            <p class="eyebrow"><?= e($lesson['course_title']) ?></p>
-            <h2 class="text-xl font-bold text-slate-100"><?= e($lesson['title']) ?></h2>
+    <div class="flex items-start justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg <?= $isCompleted ? 'bg-teal-400/20 text-teal-300 border border-teal-400/30' : 'bg-teal-300/10 text-teal-300 border border-teal-300/20' ?> flex items-center justify-center text-xs font-bold shrink-0">
+                <?php if ($isCompleted): ?>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <?php else: ?>
+                    <?= $lesson['position'] ?>
+                <?php endif; ?>
+            </span>
+            <div>
+                <p class="eyebrow"><?= e($lesson['course_title']) ?></p>
+                <h2 class="text-xl font-bold text-slate-100"><?= e($lesson['title']) ?></h2>
+            </div>
         </div>
+        <!-- Complete toggle -->
+        <form method="POST" action="/projet/student/complete_lesson.php" class="shrink-0">
+            <input type="hidden" name="lesson_id" value="<?= $lessonId ?>">
+            <?php if ($isCompleted): ?>
+                <button type="submit" class="btn-secondary btn-sm flex items-center gap-1.5 text-teal-300 border-teal-300/30">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Terminée
+                </button>
+            <?php else: ?>
+                <button type="submit" class="btn btn-sm flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Marquer comme terminée
+                </button>
+            <?php endif; ?>
+        </form>
     </div>
 
-    <div class="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed whitespace-pre-wrap border-t border-white/10 pt-6">
+    <div class="text-slate-300 leading-relaxed whitespace-pre-wrap border-t border-white/10 pt-6">
         <?= nl2br(e($lesson['content'])) ?>
     </div>
 </div>

@@ -16,15 +16,18 @@ if (!$course) {
 
 requireCourseOwner($course);
 
-$errors = [];
+$categories = $pdo->query('SELECT * FROM categories ORDER BY name ASC')->fetchAll();
+$errors     = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = trim($_POST['title'] ?? '');
+    $title       = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $errors = validateCourse(compact('title', 'description'));
+    $categoryId  = (int) ($_POST['category_id'] ?? 0) ?: null;
+    $errors      = validateCourse(compact('title', 'description'));
 
     if (!$errors) {
-        $stmt = $pdo->prepare('UPDATE courses SET title = ?, description = ? WHERE id = ?');
-        $stmt->execute([$title, $description, $id]);
+        $stmt = $pdo->prepare('UPDATE courses SET title = ?, description = ?, category_id = ? WHERE id = ?');
+        $stmt->execute([$title, $description, $categoryId, $id]);
         setFlash('success', 'Cours modifié avec succès.');
         redirect('/projet/admin/courses.php');
     }
@@ -38,7 +41,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div>
             <p class="eyebrow mb-1">Édition</p>
             <h2 class="text-xl font-bold text-slate-100">Modifier le cours</h2>
-            <p class="text-sm text-slate-400 mt-1">Mettez à jour le titre ou la description du cours.</p>
+            <p class="text-sm text-slate-400 mt-1">Mettez à jour le titre, la catégorie ou la description.</p>
         </div>
         <a class="btn-secondary shrink-0" href="/projet/admin/courses.php">Retour</a>
     </div>
@@ -52,10 +55,26 @@ require_once __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" class="space-y-5">
-        <div>
-            <label class="form-label" for="title">Titre du cours</label>
-            <input class="form-input" id="title" type="text" name="title"
-                   value="<?= e($_POST['title'] ?? $course['title']) ?>" required>
+        <div class="grid sm:grid-cols-[1fr_200px] gap-5">
+            <div>
+                <label class="form-label" for="title">Titre du cours</label>
+                <input class="form-input" id="title" type="text" name="title"
+                       value="<?= e($_POST['title'] ?? $course['title']) ?>" required>
+            </div>
+            <div>
+                <label class="form-label" for="category_id">Catégorie</label>
+                <select class="form-input" id="category_id" name="category_id">
+                    <option value="">— Aucune —</option>
+                    <?php
+                    $selectedCat = (int) ($_POST['category_id'] ?? $course['category_id'] ?? 0);
+                    foreach ($categories as $cat): ?>
+                        <option value="<?= (int) $cat['id'] ?>"
+                            <?= ($selectedCat === (int) $cat['id']) ? 'selected' : '' ?>>
+                            <?= e($cat['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <div>
             <label class="form-label" for="description">Description</label>

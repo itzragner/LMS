@@ -4,17 +4,19 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/validation.php';
 requireRole(['admin', 'prof']);
 
-$errors = [];
+$categories = $pdo->query('SELECT * FROM categories ORDER BY name ASC')->fetchAll();
+$errors     = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = trim($_POST['title'] ?? '');
+    $title       = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $errors = validateCourse(compact('title', 'description'));
+    $categoryId  = (int) ($_POST['category_id'] ?? 0) ?: null;
+    $errors      = validateCourse(compact('title', 'description'));
 
     if (!$errors) {
         $userId = currentUser()['id'];
-        $stmt = $pdo->prepare('INSERT INTO courses (title, description, created_by) VALUES (?, ?, ?)');
-        $stmt->execute([$title, $description, $userId]);
+        $stmt = $pdo->prepare('INSERT INTO courses (title, description, category_id, created_by) VALUES (?, ?, ?, ?)');
+        $stmt->execute([$title, $description, $categoryId, $userId]);
         setFlash('success', 'Cours ajouté avec succès.');
         redirect('/projet/admin/courses.php');
     }
@@ -42,11 +44,25 @@ require_once __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" class="space-y-5">
-        <div>
-            <label class="form-label" for="title">Titre du cours</label>
-            <input class="form-input" id="title" type="text" name="title"
-                   placeholder="Ex : Introduction à PHP"
-                   value="<?= e($_POST['title'] ?? '') ?>" required>
+        <div class="grid sm:grid-cols-[1fr_200px] gap-5">
+            <div>
+                <label class="form-label" for="title">Titre du cours</label>
+                <input class="form-input" id="title" type="text" name="title"
+                       placeholder="Ex : Introduction à PHP"
+                       value="<?= e($_POST['title'] ?? '') ?>" required>
+            </div>
+            <div>
+                <label class="form-label" for="category_id">Catégorie</label>
+                <select class="form-input" id="category_id" name="category_id">
+                    <option value="">— Aucune —</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= (int) $cat['id'] ?>"
+                            <?= ((int) ($_POST['category_id'] ?? 0) === (int) $cat['id']) ? 'selected' : '' ?>>
+                            <?= e($cat['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <div>
             <label class="form-label" for="description">Description</label>
