@@ -19,7 +19,7 @@ function flashClass(string $type): string
     };
 }
 
-$isAuthArea = $user && ($user['role'] === 'admin' || $user['role'] === 'student');
+$isAuthArea = $user && in_array($user['role'], ['admin', 'prof', 'student'], true);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -46,10 +46,9 @@ $isAuthArea = $user && ($user['role'] === 'admin' || $user['role'] === 'student'
 <?php if ($isAuthArea): ?>
 <div class="flex min-h-screen">
 
-    <!-- Sidebar -->
+
     <aside class="w-72 shrink-0 sticky top-0 h-screen flex flex-col bg-slate-950/80 backdrop-blur-xl border-r border-white/10 overflow-y-auto">
 
-        <!-- Brand -->
         <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-300 to-cyan-400 flex items-center justify-center font-bold text-slate-900 text-base shrink-0">N</div>
             <div>
@@ -74,7 +73,22 @@ $isAuthArea = $user && ($user['role'] === 'admin' || $user['role'] === 'student'
             <?php if ($user['role'] === 'admin'): ?>
                 <a class="nav-link <?= navActive('/admin/courses.php', $currentPath) ?>" href="/projet/admin/courses.php">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                    Tableau de bord admin
+                    Cours
+                </a>
+                <a class="nav-link <?= navActive('/admin/users.php', $currentPath) ?>" href="/projet/admin/users.php">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Utilisateurs
+                </a>
+                <a class="nav-link <?= navActive('/admin/add_course.php', $currentPath) ?>" href="/projet/admin/add_course.php">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Ajouter un cours
+                </a>
+            <?php endif; ?>
+
+            <?php if ($user['role'] === 'prof'): ?>
+                <a class="nav-link <?= navActive('/admin/courses.php', $currentPath) ?>" href="/projet/admin/courses.php">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    Mes cours
                 </a>
                 <a class="nav-link <?= navActive('/admin/add_course.php', $currentPath) ?>" href="/projet/admin/add_course.php">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -114,7 +128,11 @@ $isAuthArea = $user && ($user['role'] === 'admin' || $user['role'] === 'student'
             <div>
                 <p class="eyebrow">Espace sécurisé</p>
                 <h1 class="text-xl font-bold text-slate-100">
-                    <?= $user['role'] === 'admin' ? 'Dashboard administrateur' : 'Dashboard étudiant' ?>
+                    <?= match($user['role']) {
+                        'admin' => 'Dashboard administrateur',
+                        'prof'  => 'Dashboard professeur',
+                        default => 'Dashboard étudiant',
+                    } ?>
                 </h1>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest bg-teal-300/10 text-teal-300 border border-teal-300/20">

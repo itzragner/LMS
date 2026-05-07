@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/validation.php';
-requireRole('admin');
+requireRole(['admin', 'prof']);
 
 $errors = [];
 
@@ -12,8 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = validateCourse(compact('title', 'description'));
 
     if (!$errors) {
-        $stmt = $pdo->prepare('INSERT INTO courses (title, description) VALUES (?, ?)');
-        $stmt->execute([$title, $description]);
+        $userId = currentUser()['id'];
+        $stmt = $pdo->prepare('INSERT INTO courses (title, description, created_by) VALUES (?, ?, ?)');
+        $stmt->execute([$title, $description, $userId]);
         setFlash('success', 'Cours ajouté avec succès.');
         redirect('/projet/admin/courses.php');
     }

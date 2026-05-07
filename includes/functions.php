@@ -29,11 +29,21 @@ function requireLogin(): void
     }
 }
 
-function requireRole(string $role): void
+function requireRole(string|array $roles): void
 {
     requireLogin();
-    if ((currentUser()['role'] ?? null) !== $role) {
+    $userRole = currentUser()['role'] ?? null;
+    if (!in_array($userRole, (array) $roles, true)) {
         redirect('/projet/index.php');
+    }
+}
+
+function requireCourseOwner(array $course): void
+{
+    $user = currentUser();
+    if ($user['role'] === 'prof' && (int) $course['created_by'] !== (int) $user['id']) {
+        setFlash('danger', 'Vous n\'êtes pas autorisé à accéder à ce cours.');
+        redirect('/projet/admin/courses.php');
     }
 }
 

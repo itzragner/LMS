@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/functions.php';
 requireRole('student');
 
 $user = currentUser();
-$stmt = $pdo->prepare('SELECT c.title, c.description, e.enrolled_at FROM enrollments e INNER JOIN courses c ON c.id = e.course_id WHERE e.user_id = ? ORDER BY e.enrolled_at DESC');
+$stmt = $pdo->prepare('SELECT c.id, c.title, c.description, e.enrolled_at FROM enrollments e INNER JOIN courses c ON c.id = e.course_id WHERE e.user_id = ? ORDER BY e.enrolled_at DESC');
 $stmt->execute([$user['id']]);
 $enrollments = $stmt->fetchAll();
 $totalCourses = count($enrollments);
@@ -63,7 +63,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <p class="text-sm text-slate-400 truncate"><?= e($course['description']) ?></p>
                         <p class="text-xs text-slate-500 mt-1">Inscrit le <?= e($course['enrolled_at']) ?></p>
                     </div>
-                    <span class="tag shrink-0">Inscrit</span>
+                    <a href="/projet/student/course.php?id=<?= (int) $course['id'] ?>" class="btn btn-sm shrink-0">Voir les leçons</a>
                 </article>
             <?php endforeach; ?>
         </div>

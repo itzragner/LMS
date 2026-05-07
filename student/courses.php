@@ -43,8 +43,9 @@ require_once __DIR__ . '/../includes/header.php';
                         <?php endif; ?>
                     </div>
                     <p class="text-sm text-slate-400 flex-1"><?= e($course['description']) ?></p>
-                    <div>
+                    <div class="flex items-center gap-2">
                         <?php if ($enrolled): ?>
+                            <a class="btn btn-sm" href="/projet/student/course.php?id=<?= (int) $course['id'] ?>">Voir les leçons</a>
                             <a class="btn-danger btn-sm" href="/projet/student/unenroll.php?id=<?= (int) $course['id'] ?>">Se désinscrire</a>
                         <?php else: ?>
                             <a class="btn btn-sm" href="/projet/student/enroll.php?id=<?= (int) $course['id'] ?>">S'inscrire</a>

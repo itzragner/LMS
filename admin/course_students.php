@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
-requireRole('admin');
+requireRole(['admin', 'prof']);
 
 $courseId = (int) ($_GET['id'] ?? 0);
 
@@ -13,6 +13,8 @@ if (!$course) {
     setFlash('danger', 'Cours introuvable.');
     redirect('/projet/admin/courses.php');
 }
+
+requireCourseOwner($course);
 
 $stmt = $pdo->prepare('
     SELECT u.id, u.name, u.email, e.enrolled_at

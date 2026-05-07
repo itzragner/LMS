@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $errors = validateRegistration(compact('name', 'email', 'password'));
 
-    if (!in_array($role, ['student', 'admin'], true)) {
+    if (!in_array($role, ['student', 'admin', 'prof'], true)) {
         $errors[] = 'Rôle invalide.';
     }
 
@@ -83,6 +83,7 @@ require_once __DIR__ . '/includes/header.php';
                         <label class="form-label" for="role">Rôle</label>
                         <select class="form-input" id="role" name="role" required>
                             <option value="student" <?= (($_POST['role'] ?? '') === 'student') ? 'selected' : '' ?>>Étudiant</option>
+                            <option value="prof" <?= (($_POST['role'] ?? '') === 'prof') ? 'selected' : '' ?>>Professeur</option>
                             <option value="admin" <?= (($_POST['role'] ?? '') === 'admin') ? 'selected' : '' ?>>Administrateur</option>
                         </select>
                     </div>
