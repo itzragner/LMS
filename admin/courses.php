@@ -3,31 +3,58 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireRole(['admin', 'prof']);
 
-$user = currentUser();
+$user    = currentUser();
 $isAdmin = $user['role'] === 'admin';
+$search  = trim($_GET['q'] ?? '');
+$like    = "%$search%";
 
 if ($isAdmin) {
-    $stmt = $pdo->query('
-        SELECT c.*, COUNT(e.id) AS enrolled_count, u.name AS prof_name
-        FROM courses c
-        LEFT JOIN enrollments e ON e.course_id = c.id
-        LEFT JOIN users u ON u.id = c.created_by
-        GROUP BY c.id
-        ORDER BY c.created_at DESC
-    ');
+    if ($search !== '') {
+        $stmt = $pdo->prepare('
+            SELECT c.*, COUNT(e.id) AS enrolled_count, u.name AS prof_name
+            FROM courses c
+            LEFT JOIN enrollments e ON e.course_id = c.id
+            LEFT JOIN users u ON u.id = c.created_by
+            WHERE c.title LIKE ? OR c.description LIKE ?
+            GROUP BY c.id
+            ORDER BY c.created_at DESC
+        ');
+        $stmt->execute([$like, $like]);
+    } else {
+        $stmt = $pdo->query('
+            SELECT c.*, COUNT(e.id) AS enrolled_count, u.name AS prof_name
+            FROM courses c
+            LEFT JOIN enrollments e ON e.course_id = c.id
+            LEFT JOIN users u ON u.id = c.created_by
+            GROUP BY c.id
+            ORDER BY c.created_at DESC
+        ');
+    }
 } else {
-    $stmt = $pdo->prepare('
-        SELECT c.*, COUNT(e.id) AS enrolled_count
-        FROM courses c
-        LEFT JOIN enrollments e ON e.course_id = c.id
-        WHERE c.created_by = ?
-        GROUP BY c.id
-        ORDER BY c.created_at DESC
-    ');
-    $stmt->execute([$user['id']]);
+    if ($search !== '') {
+        $stmt = $pdo->prepare('
+            SELECT c.*, COUNT(e.id) AS enrolled_count
+            FROM courses c
+            LEFT JOIN enrollments e ON e.course_id = c.id
+            WHERE c.created_by = ? AND (c.title LIKE ? OR c.description LIKE ?)
+            GROUP BY c.id
+            ORDER BY c.created_at DESC
+        ');
+        $stmt->execute([$user['id'], $like, $like]);
+    } else {
+        $stmt = $pdo->prepare('
+            SELECT c.*, COUNT(e.id) AS enrolled_count
+            FROM courses c
+            LEFT JOIN enrollments e ON e.course_id = c.id
+            WHERE c.created_by = ?
+            GROUP BY c.id
+            ORDER BY c.created_at DESC
+        ');
+        $stmt->execute([$user['id']]);
+    }
 }
 
-$courses = $stmt->fetchAll();
+$courses      = $stmt->fetchAll();
 $totalCourses = count($courses);
 
 if ($isAdmin) {
@@ -78,10 +105,46 @@ require_once __DIR__ . '/../includes/header.php';
         <a class="btn shrink-0" href="/projet/admin/add_course.php">Ajouter un cours</a>
     </div>
 
+    <!-- Search bar -->
+    <form method="GET" class="mb-6">
+        <div class="relative">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input class="form-input pl-11 pr-10"
+                   type="text" name="q"
+                   value="<?= e($search) ?>"
+                   placeholder="Rechercher par titre ou description…">
+            <?php if ($search !== ''): ?>
+                <a href="/projet/admin/courses.php"
+                   class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                   title="Effacer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </a>
+            <?php endif; ?>
+        </div>
+    </form>
+
+    <?php if ($search !== ''): ?>
+        <p class="text-sm text-slate-400 mb-4">
+            <?= count($courses) ?> résultat<?= count($courses) !== 1 ? 's' : '' ?> pour
+            <span class="text-slate-200 font-medium">"<?= e($search) ?>"</span>
+        </p>
+    <?php endif; ?>
+
     <?php if (!$courses): ?>
         <div class="text-center py-12">
-            <p class="text-lg font-semibold text-slate-300 mb-1">Aucun cours créé</p>
-            <p class="text-sm text-slate-500">Commencez par ajouter votre premier cours à la plateforme.</p>
+            <?php if ($search !== ''): ?>
+                <div class="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <p class="text-lg font-semibold text-slate-300 mb-1">Aucun cours trouvé</p>
+                <p class="text-sm text-slate-500 mb-4">Aucun cours ne correspond à "<span class="text-slate-400"><?= e($search) ?></span>".</p>
+                <a href="/projet/admin/courses.php" class="btn-secondary btn-sm">Voir tous les cours</a>
+            <?php else: ?>
+                <p class="text-lg font-semibold text-slate-300 mb-1">Aucun cours créé</p>
+                <p class="text-sm text-slate-500">Commencez par ajouter votre premier cours à la plateforme.</p>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="overflow-x-auto -mx-6 px-6">

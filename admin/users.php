@@ -3,18 +3,34 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireRole('admin');
 
-$stmt = $pdo->query('
-    SELECT u.*, COUNT(e.id) AS enrollment_count
-    FROM users u
-    LEFT JOIN enrollments e ON e.user_id = u.id
-    GROUP BY u.id
-    ORDER BY u.id ASC
-');
+$search = trim($_GET['q'] ?? '');
+$like   = "%$search%";
+
+if ($search !== '') {
+    $stmt = $pdo->prepare('
+        SELECT u.*, COUNT(e.id) AS enrollment_count
+        FROM users u
+        LEFT JOIN enrollments e ON e.user_id = u.id
+        WHERE u.name LIKE ? OR u.email LIKE ?
+        GROUP BY u.id
+        ORDER BY u.id ASC
+    ');
+    $stmt->execute([$like, $like]);
+} else {
+    $stmt = $pdo->query('
+        SELECT u.*, COUNT(e.id) AS enrollment_count
+        FROM users u
+        LEFT JOIN enrollments e ON e.user_id = u.id
+        GROUP BY u.id
+        ORDER BY u.id ASC
+    ');
+}
+
 $users = $stmt->fetchAll();
 
-$totalUsers    = count($users);
-$totalStudents = count(array_filter($users, fn($u) => $u['role'] === 'student'));
-$totalProfs    = count(array_filter($users, fn($u) => $u['role'] === 'prof'));
+$allUsers      = (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+$totalStudents = (int) $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'student'")->fetchColumn();
+$totalProfs    = (int) $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'prof'")->fetchColumn();
 
 require_once __DIR__ . '/../includes/header.php';
 
@@ -33,7 +49,7 @@ function roleBadge(string $role): string
 <div class="grid sm:grid-cols-3 gap-5">
     <article class="metric-box">
         <p class="eyebrow mb-1">Utilisateurs</p>
-        <p class="text-4xl font-extrabold text-slate-100 my-1"><?= $totalUsers ?></p>
+        <p class="text-4xl font-extrabold text-slate-100 my-1"><?= $allUsers ?></p>
         <p class="text-sm text-slate-400">Comptes enregistrés au total.</p>
     </article>
     <article class="metric-box">
@@ -59,9 +75,45 @@ function roleBadge(string $role): string
         <a class="btn shrink-0" href="/projet/admin/add_user.php">Ajouter un utilisateur</a>
     </div>
 
+    <!-- Search bar -->
+    <form method="GET" class="mb-6">
+        <div class="relative">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input class="form-input pl-11 pr-10"
+                   type="text" name="q"
+                   value="<?= e($search) ?>"
+                   placeholder="Rechercher par nom ou email…">
+            <?php if ($search !== ''): ?>
+                <a href="/projet/admin/users.php"
+                   class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                   title="Effacer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </a>
+            <?php endif; ?>
+        </div>
+    </form>
+
+    <?php if ($search !== ''): ?>
+        <p class="text-sm text-slate-400 mb-4">
+            <?= count($users) ?> résultat<?= count($users) !== 1 ? 's' : '' ?> pour
+            <span class="text-slate-200 font-medium">"<?= e($search) ?>"</span>
+        </p>
+    <?php endif; ?>
+
     <?php if (!$users): ?>
         <div class="text-center py-12">
-            <p class="text-lg font-semibold text-slate-300 mb-1">Aucun utilisateur</p>
+            <?php if ($search !== ''): ?>
+                <div class="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <p class="text-lg font-semibold text-slate-300 mb-1">Aucun utilisateur trouvé</p>
+                <p class="text-sm text-slate-500 mb-4">Aucun compte ne correspond à "<span class="text-slate-400"><?= e($search) ?></span>".</p>
+                <a href="/projet/admin/users.php" class="btn-secondary btn-sm">Voir tous les utilisateurs</a>
+            <?php else: ?>
+                <p class="text-lg font-semibold text-slate-300 mb-1">Aucun utilisateur</p>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="overflow-x-auto -mx-6 px-6">
