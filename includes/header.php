@@ -108,6 +108,10 @@ $isAuthArea = $user && in_array($user['role'], ['admin', 'prof', 'student'], tru
             <?php endif; ?>
 
             <div class="mt-auto pt-3 border-t border-white/10">
+                <a class="nav-link <?= navActive('/profile.php', $currentPath) ?>" href="/projet/profile.php">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Mon profil
+                </a>
                 <a class="nav-link" href="/projet/index.php">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     Retour accueil
